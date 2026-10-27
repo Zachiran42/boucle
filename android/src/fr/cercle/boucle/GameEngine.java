@@ -16,7 +16,10 @@ public final class GameEngine {
     public final List<Hazard> hazards = new ArrayList<Hazard>();
     public int score, combo, lives;
     public float remaining, damageCooldown;
-    public boolean over;
+    public boolean over, won;
+    public LevelSpec level;
+    public float duration=DURATION;
+    public int collected, largestGroup, bestStreak;
 
     public static class Point {
         public float x, y;
@@ -42,11 +45,27 @@ public final class GameEngine {
     public GameEngine(long seed) { reset(seed); }
     public void reset(long seed) {
         random = new Random(seed); dots.clear(); hazards.clear();
-        score = 0; combo = 0; lives = 3; remaining = DURATION; damageCooldown = 0f; over = false;
+        score = 0; combo = 0; lives = 3; remaining = DURATION; duration=DURATION; damageCooldown = 0f; over = false; won=false; level=null; collected=0; largestGroup=0; bestStreak=0;
         addHazard(250f, 340f, 27f, 82f);
         addHazard(760f, 650f, 30f, 73f);
         addHazard(430f, 1020f, 25f, 91f);
         for (int i = 0; i < DOT_COUNT; i++) spawnDot();
+    }
+    /** Each retry uses the same authored rules and initial random layout. */
+    public void startLevel(int number) {
+        LevelSpec spec=LevelSpec.get(number);reset(spec.seed);level=spec;duration=spec.seconds;remaining=duration;
+        dots.clear();hazards.clear();
+        float[][] positions={{700,300},{650,750},{400,550},{800,1100},{250,250},{500,1000}};
+        for(int i=0;i<spec.hazardCount;i++)addHazard(positions[i][0]+random.nextFloat()*30-15,positions[i][1]+random.nextFloat()*30-15,25+(number+i)%5,spec.speed*(.90f+i*.035f));
+        // A readable opening cluster makes the grouped objective attainable.
+        int cluster=Math.max(4,spec.minGroup);
+        float[][] openings={{205,1040},{800,520},{205,650},{470,160}};float[] center=openings[(number-1)%openings.length];
+        for(int i=0;i<cluster;i++){double a=i*Math.PI*2/cluster;dots.add(new Dot(center[0]+(float)Math.cos(a)*105,center[1]+(float)Math.sin(a)*105));}
+        while(dots.size()<spec.dotCount)spawnDot();
+    }
+    public int earnedStars(){if(!won||level==null)return 0;return 1+(lives>=2?1:0)+(remaining>=duration*.35f?1:0);}
+    private void checkObjective(){
+        if(level!=null&&collected>=level.target&&largestGroup>=level.minGroup&&bestStreak>=level.streak){won=true;over=true;}
     }
     private void addHazard(float x, float y, float radius, float speed) {
         double angle = random.nextDouble() * Math.PI * 2;
@@ -58,7 +77,7 @@ public final class GameEngine {
         float step = Math.min(MAX_DT, dt);
         damageCooldown = Math.max(0f, damageCooldown - step);
         remaining = Math.max(0f, remaining - step);
-        float factor = 1f + (DURATION - remaining) / 150f;
+        float factor = 1f + (duration - remaining) / 150f;
         for (Hazard h : hazards) {
             h.x += h.vx * step * factor; h.y += h.vy * step * factor;
             float left = h.radius + 20f, right = WIDTH - h.radius - 20f;
@@ -90,9 +109,10 @@ public final class GameEngine {
         }
         if (r.count == 0) { combo = 0; return r; }
         r.points = 10 * r.count * r.count * Math.min(combo + 1, MAX_MULTIPLIER);
-        score += r.points; combo++;
+        score += r.points; combo++; collected+=r.count; largestGroup=Math.max(largestGroup,r.count); bestStreak=Math.max(bestStreak,combo);
         r.x = centerX / r.count; r.y = centerY / r.count;
         for (int i = 0; i < r.count; i++) spawnDot();
+        checkObjective();
         return r;
     }
     private void damage(CaptureResult r) {

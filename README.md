@@ -1,68 +1,62 @@
 # Boucle
 
-[Télécharger Boucle.apk](https://github.com/Zachiran42/boucle/releases/latest/download/Boucle-1.0.0.apk) · [Toutes les versions](https://github.com/Zachiran42/boucle/releases)
+[Télécharger Boucle.apk](https://github.com/Zachiran42/boucle/releases/latest/download/Boucle-1.1.0.apk) · [Versions](https://github.com/Zachiran42/boucle/releases) · [Les 50 niveaux](NIVEAUX.md)
 
-Un petit jeu Android de dessin et de réflexes, créé pour Cercle. Trace une boucle, capture les points et garde les obstacles corail à l’extérieur.
+Jeu Android de dessin et de réflexes créé pour Cercle. Trace une boucle autour des points lumineux et garde les éclats corail à l’extérieur.
 
-- Parties de **60 secondes**, avec **3 vies**.
-- Plus une boucle capture de points, plus elle rapporte. Enchaîne les captures pour faire monter le combo.
-- Jeu hors ligne, sans compte, publicité ni permission Android.
-- Record sauvegardé sur l’appareil et pause pendant la partie.
-- Android **8.0 ou version ultérieure**. APK universel, sans service externe.
+## Une campagne de 50 niveaux
+
+Cinq chapitres de dix niveaux, avec des configurations et des objectifs définis :
+
+1. Premiers gestes : découvrir la capture et les premiers obstacles.
+2. Prendre de l’élan : capturer en groupe et enchaîner les réussites.
+3. Le trait danse : plus d’éclats et des objectifs combinés.
+4. Maîtriser la boucle : précision, grandes captures et longues séries.
+5. Le grand cercle : les dix derniers défis, jusqu’au niveau 50.
+
+Chaque niveau demande un total de points capturés dans un temps limité, parfois avec un groupe minimum dans une seule boucle ou une série de captures réussies. Les objectifs sont visibles avant et pendant la partie. Le niveau suivant se débloque après une victoire. Les niveaux déjà débloqués restent rejouables.
+
+Une victoire donne une étoile. Conserver au moins deux vies donne une étoile supplémentaire ; terminer avec au moins 35 % du temps en donne une autre. La meilleure note est conservée, jusqu’à150 étoiles. La progression est sauvegardée sur le téléphone.
+
+Le **mode libre** reste disponible : parties de60 secondes, trois vies, combos et record local. Son record est conservé lors de la mise à jour depuis 1.0.0.
 
 ## Jouer
 
-1. Lance une partie, puis pose un doigt dans la zone de jeu.
-2. Trace une boucle autour des points clairs et reviens au point de départ pour la refermer.
-3. Évite les obstacles mobiles : toucher un obstacle avec le trait ou en enfermer un coûte une vie.
-4. Utilise la pause pour interrompre la partie. Essaie de battre ton record avant la fin du temps.
+Pose un doigt dans le terrain, entoure des points clairs, puis reviens au départ pour fermer la boucle. Un éclat corail touché par le trait ou enfermé coûte une vie. Une boucle vide ou un éclat remet la série courante à zéro. Une fois un objectif de série atteint, il reste validé pour ce niveau.
 
-Le record reste local. Il disparaît si les données de l’application sont effacées ou si celle-ci est désinstallée.
+Le bouton de pause permet de reprendre ou recommencer. Quitter l’appli suspend la partie. Sons désactivables et aide intégrée.
 
-## Installer et ajouter dans Cercle
+Jeu hors ligne, sans compte, publicité, achat ni permission Android. Android 8.0 ou ultérieur. APK universel.
 
-Télécharge l’APK signé depuis les **Releases** de ce dépôt, puis ouvre-le sur un téléphone Android et suis la confirmation d’installation.
+## Installer et mettre à jour dans Cercle
 
-Dans [Cercle](https://github.com/Zachiran42/cercle-store), utilise **Ajouter depuis GitHub**, colle le lien de ce dépôt puis sélectionne l’APK de la publication. Cercle vérifie son identité avant de proposer l’installation. L’ajout personnel reste sur ce téléphone. Pour une présence dans le catalogue partagé, le propriétaire du store importe l’APK dans son administration locale puis republie le catalogue.
+Télécharger l’APK signé depuis les Releases, puis suivre la confirmation Android. Pour conserver les données, installer la nouvelle version par-dessus l’ancienne, sans désinstaller.
 
-Identifiant de l’application : `fr.cercle.boucle`. Première version : `1.0.0`, `versionCode` : `1`. Les prochaines versions doivent conserver cet identifiant et la même clé de signature, avec un `versionCode` supérieur.
+Dans [Cercle](https://github.com/Zachiran42/cercle-store), actualiser le catalogue pour retrouver Boucle. L’application peut aussi être ajoutée avec «Ajouter depuis GitHub» et le lien de ce dépôt. Un ajout personnel reste sur ce téléphone ; le catalogue partagé est géré par le propriétaire du store.
+
+Identité : fr.cercle.boucle. Version1.1.0, versionCode 2. Les mises à jour conservent le même identifiant et certificat, avec un versionCode supérieur. Effacer les données ou désinstaller supprime la progression locale et le record.
 
 ## Compiler sous Windows
 
-La compilation utilise directement les outils Android et Java, sans Gradle ni dépendance à télécharger :
+Outils : JDK 21, Android SDK Platform 36, Build Tools 36.0.0, PowerShell 5.1+. Compilation directe, sans Gradle ni bibliothèque externe.
 
-- Java JDK 21 ;
-- Android SDK Platform 36 ;
-- Android SDK Build Tools 36.0.0 ;
-- PowerShell 5.1 ou version ultérieure.
-
-Copie `.toolchain.example.json` en `.toolchain.json`, puis renseigne les chemins absolus vers le JDK, `android.jar` et les Build Tools. Tu peux également fournir une configuration externe avec `-ToolchainFile`.
-
-Fournis une clé de signature conservée **en dehors du dépôt**. Le mot de passe est lu depuis la variable d’environnement `BOUCLE_KEYSTORE_PASSWORD` ; le script ne le sauvegarde pas et ne crée pas de clé. La clé et son mot de passe doivent être conservés pour pouvoir publier des mises à jour installables par-dessus la première version.
+Copier .toolchain.example.json en .toolchain.json et renseigner javaHome, androidJar et buildTools. Fournir une clé conservée hors du dépôt et charger son mot de passe dans BOUCLE_KEYSTORE_PASSWORD, sans inscrire de secret dans les sources. Mot de passe du magasin et de la clé identiques pour le script.
 
 ```powershell
 .\scripts\test.ps1
-.\scripts\build.ps1 -KeyStore 'C:\cles-privees\boucle.jks' -KeyAlias boucle
+.\scripts\build.ps1 -KeyStore 'C:\cles-privees\boucle.p12' -KeyAlias boucle
 ```
 
-Le mot de passe de la clé et celui du magasin doivent correspondre pour ce script. Le fichier produit par défaut est `build/Boucle-1.0.0.apk`. Pour choisir un dossier de travail ou une destination :
+Options : -ToolchainFile, -BuildDir et -OutputFile. L’APK produit par défaut est build/Boucle-1.1.0.apk. Le script compile, aligne, signe et vérifie la signature et le SHA-256.
 
-```powershell
-.\scripts\build.ps1 -ToolchainFile 'C:\outils\android.json' -KeyStore 'C:\cles-privees\boucle.jks' -OutputFile 'C:\livraisons\Boucle-1.0.0.apk' -BuildDir 'C:\temp\boucle-build'
-```
+## Sources et vérification
 
-Le script compile les ressources et les sources Java, produit les fichiers DEX, aligne l’APK, le signe puis vérifie sa signature et son alignement. Il affiche également son SHA-256. Aucun fichier privé de signature ne doit être ajouté à GitHub ou à une archive de sources.
+- LevelSpec.java : les50 configurations et leurs noms.
+- GameEngine.java : géométrie, captures, objectifs et règles.
+- CampaignProgress.java : déblocages et meilleures étoiles.
+- MainActivity.java et GameView.java : navigation native, sélection et tracé.
+- tests/ : régressions du mode libre et simulation déterministe des50 niveaux.
 
-## Structure
-
-- `android/src/fr/cercle/boucle/` : interface native et moteur du jeu.
-- `android/res/` : thème et icône vectorielle.
-- `tests/GameEngineTest.java` : tests du moteur, exécutés sans Android.
-- `scripts/build.ps1` : création de l’APK signé.
-- `scripts/test.ps1` : compilation et exécution des tests du moteur.
-
-Les tests du moteur et la compilation ne remplacent pas une validation de l’affichage, des gestes et des performances sur téléphone.
-
-## Licence
+Voir [VALIDATION.md](VALIDATION.md). Les tests et rendus JVM ne remplacent pas un essai tactile sur appareil Android réel.
 
 Code et visuels sous licence [MIT](LICENSE).

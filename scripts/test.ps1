@@ -14,8 +14,13 @@ $classes = Join-Path $BuildDir ('tests-' + [Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $classes -Force | Out-Null
 $engine = Join-Path $projectRoot 'android\src\fr\cercle\boucle\GameEngine.java'
 $test = Join-Path $projectRoot 'tests\GameEngineTest.java'
-& $javac -encoding UTF-8 -source 8 -target 8 -d $classes $engine $test
+$level = Join-Path $projectRoot 'android\src\fr\cercle\boucle\LevelSpec.java'
+$progress = Join-Path $projectRoot 'android\src\fr\cercle\boucle\CampaignProgress.java'
+$campaignTest = Join-Path $projectRoot 'tests\CampaignTest.java'
+& $javac -encoding UTF-8 -source 8 -target 8 -d $classes $engine $level $progress $test $campaignTest
 if ($LASTEXITCODE -ne 0) { throw 'Compilation des tests impossible.' }
 & $java -ea -cp $classes fr.cercle.boucle.GameEngineTest
 if ($LASTEXITCODE -ne 0) { throw 'Les tests du moteur ont echoue.' }
-Write-Output 'Tests du moteur termines.'
+& $java -ea -cp $classes fr.cercle.boucle.CampaignTest
+if ($LASTEXITCODE -ne 0) { throw 'Les tests de campagne ont echoue.' }
+Write-Output 'Tests du moteur et de campagne termines.'

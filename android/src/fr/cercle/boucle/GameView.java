@@ -19,6 +19,8 @@ public final class GameView extends View {
     public interface Listener {void onStateChanged(int state);void onCapture(boolean hit);}
     public static final int HOME=0,PLAYING=1,PAUSED=2,OVER=3;
     public int state=HOME,best;
+    public int selectedLevel=1,unlocked=1,totalStars=0,completedLevels=0;
+    public float footerPixels=184;
     public final GameEngine engine=new GameEngine(System.nanoTime());
     private final Listener listener;
     private final Paint paint=new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -41,14 +43,21 @@ public final class GameView extends View {
         setContentDescription("Terrain de Boucle. Dessine autour des points et reviens au début du tracé. Évite les éclats corail.");
     }
     public void setActive(boolean value){active=value;frameNanos=0;if(value)postInvalidateOnAnimation();}
+    public void setCampaignProgress(int unlocked,int stars,int completed){this.unlocked=Math.max(1,Math.min(50,unlocked));totalStars=stars;completedLevels=completed;invalidate();}
+    public void selectLevel(int number){selectedLevel=Math.max(1,Math.min(unlocked,number));state=HOME;trail.clear();finger=-1;listener.onStateChanged(state);invalidate();}
+    public void startLevel(int number){
+        if(number<1||number>unlocked)return;
+        selectedLevel=number;engine.startLevel(number);trail.clear();particles.clear();finger=-1;lockedStroke=false;noticeTime=0;floatingTime=0;fillTime=0;newRecord=false;
+        state=PLAYING;frameNanos=0;listener.onStateChanged(state);invalidate();
+    }
     public void startGame(){
         engine.reset(System.nanoTime());trail.clear();particles.clear();finger=-1;lockedStroke=false;
         noticeTime=0;floatingTime=0;fillTime=0;newRecord=false;state=PLAYING;frameNanos=0;listener.onStateChanged(state);invalidate();
     }
     public void pauseGame(){if(state!=PLAYING)return;trail.clear();finger=-1;lockedStroke=false;state=PAUSED;listener.onStateChanged(state);invalidate();}
     public void resumeGame(){if(state!=PAUSED)return;state=PLAYING;frameNanos=0;listener.onStateChanged(state);invalidate();}
-    public void goHome(){state=HOME;trail.clear();finger=-1;listener.onStateChanged(state);invalidate();}
-    private void finishGame(){state=OVER;trail.clear();finger=-1;newRecord=engine.score>best;best=Math.max(best,engine.score);listener.onStateChanged(state);}
+    public void goHome(){if(engine.level!=null&&engine.won)selectedLevel=Math.min(unlocked,Math.min(50,engine.level.number+1));state=HOME;trail.clear();finger=-1;listener.onStateChanged(state);invalidate();}
+    private void finishGame(){state=OVER;trail.clear();finger=-1;newRecord=engine.level==null&&engine.score>best;if(engine.level==null)best=Math.max(best,engine.score);listener.onStateChanged(state);}
     @Override protected void onSizeChanged(int w,int h,int oldw,int oldh){ui=w/390f;height=h/ui;layoutBoard();}
     private void layoutBoard(){
         float top=(state==HOME?228:160)*ui,bottom=getHeight()-(state==HOME?140:86)*ui;
@@ -60,7 +69,7 @@ public final class GameView extends View {
         if(state==PLAYING){float budget=elapsed;while(budget>0 && state==PLAYING && !engine.over){float step=Math.min(GameEngine.MAX_DT,budget);engine.update(step);budget-=step;if(!trail.isEmpty()&&engine.touchesHazard(trail))resolveStroke();}if(engine.over&&state==PLAYING)finishGame();}
         noticeTime=Math.max(0,noticeTime-dt);flashTime=Math.max(0,flashTime-dt);floatingTime=Math.max(0,floatingTime-dt);fillTime=Math.max(0,fillTime-dt);
         for(int i=particles.size()-1;i>=0;i--){Particle p=particles.get(i);p.life-=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=.98f;p.vy*=.98f;if(p.life<=0)particles.remove(i);}
-        layoutBoard();c.drawColor(0xff0b1418);if(state==HOME)drawHome(c);else if(state==PLAYING)drawHud(c);drawBoard(c,state==HOME);if(state==HOME)center(c,"Capture les points. Évite le corail.",195,board.bottom/ui+24,12,MUTED,regular);
+        layoutBoard();c.drawColor(0xff0b1418);if(state==HOME)drawHome(c);else{if(state==PLAYING)drawHud(c);drawBoard(c,false);}
         if(state==PLAYING)drawHint(c);if(state==PAUSED||state==OVER)drawEndCard(c);if(active)postInvalidateOnAnimation();
     }
     private void text(Canvas c,String s,float x,float y,float size,int color,Typeface face){
@@ -74,16 +83,40 @@ public final class GameView extends View {
         float pos=x*ui;for(int i=0;i<s.length();i++){String a=s.substring(i,i+1);c.drawText(a,pos,y*ui,paint);pos+=paint.measureText(a)+1.5f*ui;}
     }
     private void drawHome(Canvas c){
-        tracked(c,"UN JEU PAR CERCLE",24,91,MINT);text(c,"Le geste fait",22,137,37,WHITE,bold);text(c,"le score.",22,178,37,WHITE,bold);
-        text(c,"Dessine. Referme. Capture.",24,207,14,MUTED,regular);
-        paint.setColor(0xff233a37);paint.setStyle(Paint.Style.FILL);c.drawRoundRect(new RectF(238*ui,78*ui,366*ui,105*ui),13*ui,13*ui,paint);
-        center(c,"RECORD  "+best,302,96,10,MINT,medium);
+        float bottom=Math.min(518,height-footerPixels/ui-8);boolean compact=bottom<372,tiny=bottom<330;float top=tiny?188:compact?198:218;
+        tracked(c,"LA CAMPAGNE DE CERCLE",24,91,MINT);text(c,"Une boucle.",22,tiny?120:compact?127:137,tiny?29:compact?33:37,WHITE,bold);text(c,"50 défis.",22,tiny?154:compact?166:178,tiny?29:compact?33:37,WHITE,bold);
+        text(c,"Un niveau à la fois, à ton rythme.",24,tiny?177:compact?190:204,tiny?12:14,MUTED,regular);
+        paint.setColor(0xff233a37);paint.setStyle(Paint.Style.FILL);c.drawRoundRect(new RectF(262*ui,78*ui,366*ui,105*ui),13*ui,13*ui,paint);
+        center(c,completedLevels+" / 50 RÉUSSIS",314,96,9,MINT,medium);
+        LevelSpec spec=LevelSpec.get(selectedLevel);
+        paint.setColor(0xff112126);c.drawRoundRect(24*ui,top*ui,366*ui,bottom*ui,20*ui,20*ui,paint);
+        tracked(c,"CHAPITRE "+(spec.chapter()+1)+" · "+spec.chapterName().toUpperCase(Locale.FRANCE),42,top+25,MUTED);
+        text(c,spec.number+". "+spec.name,40,top+(tiny?49:59),tiny?18:21,WHITE,medium);
+        text(c,spec.objective(),42,top+(tiny?73:84),tiny?12:13,MINT,regular);
+        if(bottom-top>135)text(c,spec.extras().isEmpty()?"Trois vies pour trouver le bon geste.":spec.extras(),42,top+107,11,MUTED,regular);
+        if(bottom-top>220){
+            float y=(bottom-77)*ui;paint.setStyle(Paint.Style.STROKE);paint.setStrokeWidth(2*ui);paint.setColor(MINT);c.drawCircle(195*ui,y,39*ui,paint);paint.setStyle(Paint.Style.FILL);
+            for(int i=0;i<5;i++){double a=i*Math.PI*2/5+time*.12;paint.setColor(WHITE);c.drawCircle((195+(float)Math.cos(a)*22)*ui,y+(float)Math.sin(a)*22*ui,3.5f*ui,paint);}
+            paint.setColor(CORAL);c.drawCircle(252*ui,y+15*ui,4*ui,paint);
+        }
+        int first=spec.chapter()*10+1;float y=bottom-19;
+        if(bottom-top>120)for(int i=0;i<10;i++){int n=first+i;float x=69+i*28;boolean done=n<unlocked||(n==50&&completedLevels==50);paint.setStyle(Paint.Style.FILL);paint.setColor(n==selectedLevel?MINT:done?0xff355f4b:0xff243a3f);c.drawCircle(x*ui,y*ui,9*ui,paint);center(c,String.valueOf(n),x,y+3,8,n==selectedLevel?0xff0b1418:WHITE,medium);}
     }
     private void drawHud(Canvas c){
-        tracked(c,"SCORE",24,86,MUTED);text(c,String.format(Locale.ROOT,"%04d",engine.score),22,125,34,WHITE,bold);
+        boolean campaign=engine.level!=null;
+        tracked(c,campaign?"CAPTURES":"SCORE",24,86,MUTED);
+        String value=campaign?engine.collected+" / "+engine.level.target:String.format(Locale.ROOT,"%04d",engine.score);
+        text(c,value,22,125,value.length()>6?27:34,WHITE,bold);
         tracked(c,"TEMPS",165,86,MUTED);text(c,String.format(Locale.ROOT,"%02d",(int)Math.ceil(engine.remaining))+" s",163,125,30,engine.remaining<=10?CORAL:WHITE,medium);
         tracked(c,"VIES",293,86,MUTED);for(int i=0;i<3;i++){paint.setColor(i<engine.lives?CORAL:0xff2c3b3f);c.drawCircle((302+i*21)*ui,113*ui,5.5f*ui,paint);}
-        text(c,"×"+Math.min(engine.combo+1,5),24,148,12,MINT,medium);text(c,engine.combo>0?"Capture groupée = gros score":"La prochaine belle boucle est à toi",56,148,11,MUTED,regular);
+        if(campaign)text(c,goalProgress(),24,148,11,MINT,regular);
+        else{text(c,"×"+Math.min(engine.combo+1,5),24,148,12,MINT,medium);text(c,engine.combo>0?"Capture groupée = gros score":"La prochaine belle boucle est à toi",56,148,11,MUTED,regular);}
+    }
+    private String goalProgress(){
+        LevelSpec l=engine.level;if(l==null)return "";
+        String group=l.minGroup>0?"Groupe "+engine.largestGroup+" / "+l.minGroup:"";
+        String streak=l.streak>0?"Série "+engine.bestStreak+" / "+l.streak:"";
+        return group.isEmpty()?(streak.isEmpty()?"Capture les points lumineux pour réussir":streak):streak.isEmpty()?group:group+"   ·   "+streak;
     }
     private void drawBoard(Canvas c,boolean demo){
         int save=c.save();paint.setStyle(Paint.Style.FILL);paint.setColor(0xff112126);c.drawRoundRect(board,20*ui,20*ui,paint);
@@ -122,15 +155,27 @@ public final class GameView extends View {
     private void drawHint(Canvas c){
         String hint=noticeTime>0?notice:trail.isEmpty()?"Dessine autour des points lumineux":"Reviens au départ pour fermer la boucle";
         center(c,hint,195,height-52,13,noticeTime>0?WHITE:MUTED,regular);center(c,"ÉVITE LES ÉCLATS CORAIL",195,height-29,9,0xff678b87,medium);
-        float ratio=Math.max(0,engine.remaining/60f);paint.setColor(0xff243a3c);c.drawRoundRect(24*ui,(height-11)*ui,366*ui,(height-8)*ui,2*ui,2*ui,paint);paint.setColor(engine.remaining<=10?CORAL:MINT);c.drawRoundRect(24*ui,(height-11)*ui,(24+342*ratio)*ui,(height-8)*ui,2*ui,2*ui,paint);
+        float ratio=Math.max(0,engine.remaining/engine.duration);paint.setColor(0xff243a3c);c.drawRoundRect(24*ui,(height-11)*ui,366*ui,(height-8)*ui,2*ui,2*ui,paint);paint.setColor(engine.remaining<=10?CORAL:MINT);c.drawRoundRect(24*ui,(height-11)*ui,(24+342*ratio)*ui,(height-8)*ui,2*ui,2*ui,paint);
     }
     private void drawEndCard(Canvas c){
-        paint.setColor(0xe60b1418);c.drawRect(0,64*ui,getWidth(),getHeight()-145*ui,paint);float middle=Math.max(240,(height-150)/2);
-        tracked(c,state==PAUSED?"PAUSE":"PARTIE TERMINÉE",24,middle-115,MINT);text(c,state==PAUSED?"On souffle ?":newRecord?"Nouvelle marque !":"Bien bouclé.",22,middle-66,33,WHITE,bold);
-        text(c,state==PAUSED?"Le chrono t’attend.":engine.lives==0?"Les éclats ont eu le dernier mot.":"Chaque boucle compte.",24,middle-32,14,MUTED,regular);
-        text(c,String.valueOf(engine.score),20,middle+50,72,WHITE,bold);tracked(c,"POINTS",26,middle+76,MUTED);
-        paint.setColor(0xff253e38);c.drawRoundRect(24*ui,(middle+103)*ui,366*ui,(middle+151)*ui,14*ui,14*ui,paint);text(c,"TON RECORD",40,middle+132,11,MUTED,medium);
-        paint.setTextAlign(Paint.Align.RIGHT);paint.setTextSize(20*ui);paint.setColor(MINT);paint.setTypeface(medium);c.drawText(String.valueOf(best),348*ui,(middle+134)*ui,paint);paint.setTextAlign(Paint.Align.LEFT);
+        paint.setStyle(Paint.Style.FILL);paint.setColor(0xe60b1418);c.drawRect(0,64*ui,getWidth(),getHeight(),paint);float middle=Math.max(180,Math.min(Math.max(215,(height-190)/2),height-footerPixels/ui-160));
+        if(engine.level!=null){
+            LevelSpec l=engine.level;tracked(c,state==PAUSED?"PAUSE · NIVEAU "+l.number:"NIVEAU "+l.number+" / 50",24,middle-115,MINT);
+            String title=state==PAUSED?"On souffle ?":engine.won?l.number==50?"Les 50 sont bouclés !":"Niveau réussi !":"Encore un essai ?";
+            text(c,title,22,middle-66,l.number==50&&engine.won?29:33,WHITE,bold);
+            String detail=state==PAUSED?l.name:engine.won?l.chapterName():engine.lives==0?"Les éclats ont eu le dernier mot.":"Le temps est écoulé. À toi de rejouer !";
+            text(c,detail,24,middle-32,13,MUTED,regular);
+            text(c,engine.collected+" / "+l.target,20,middle+43,56,WHITE,bold);tracked(c,"POINTS CAPTURÉS",26,middle+71,MUTED);
+            paint.setColor(0xff253e38);c.drawRoundRect(24*ui,(middle+92)*ui,366*ui,(middle+151)*ui,14*ui,14*ui,paint);
+            if(engine.won){String stars="";for(int i=0;i<3;i++)stars+=i<engine.earnedStars()?"★ ":"☆ ";center(c,stars.trim(),195,middle+132,29,MINT,medium);}
+            else center(c,goalProgress(),195,middle+126,12,MINT,regular);
+        }else{
+            tracked(c,state==PAUSED?"PAUSE":"PARTIE TERMINÉE",24,middle-115,MINT);text(c,state==PAUSED?"On souffle ?":newRecord?"Nouvelle marque !":"Bien bouclé.",22,middle-66,33,WHITE,bold);
+            text(c,state==PAUSED?"Le chrono t’attend.":engine.lives==0?"Les éclats ont eu le dernier mot.":"Chaque boucle compte.",24,middle-32,14,MUTED,regular);
+            text(c,String.valueOf(engine.score),20,middle+50,72,WHITE,bold);tracked(c,"POINTS",26,middle+76,MUTED);
+            paint.setColor(0xff253e38);c.drawRoundRect(24*ui,(middle+103)*ui,366*ui,(middle+151)*ui,14*ui,14*ui,paint);text(c,"TON RECORD",40,middle+132,11,MUTED,medium);
+            paint.setTextAlign(Paint.Align.RIGHT);paint.setTextSize(20*ui);paint.setColor(MINT);paint.setTypeface(medium);c.drawText(String.valueOf(best),348*ui,(middle+134)*ui,paint);paint.setTextAlign(Paint.Align.LEFT);
+        }
     }
     private static int alpha(int color,int a){return(color&0xffffff)|(Math.max(0,Math.min(a,255))<<24);}
     @Override public boolean onTouchEvent(MotionEvent event){
