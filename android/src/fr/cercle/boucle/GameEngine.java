@@ -55,7 +55,7 @@ public final class GameEngine {
     public void startLevel(int number) {
         LevelSpec spec=LevelSpec.get(number);reset(spec.seed);level=spec;duration=spec.seconds;remaining=duration;
         dots.clear();hazards.clear();
-        float[][] positions={{700,300},{650,750},{400,550},{800,1100},{250,250},{500,1000}};
+        float[][] positions={{700,300},{650,750},{400,550},{800,1100},{250,250},{500,1000},{900,70}};
         for(int i=0;i<spec.hazardCount;i++)addHazard(positions[i][0]+random.nextFloat()*30-15,positions[i][1]+random.nextFloat()*30-15,25+(number+i)%5,spec.speed*(.90f+i*.035f));
         // A readable opening cluster makes the grouped objective attainable.
         int cluster=Math.max(4,spec.minGroup);

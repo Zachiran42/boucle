@@ -13,22 +13,22 @@ public final class LevelSpec {
     }
     // seconds, dots, hazards, speed, total captures, largest group, successful streak
     private static final int[][] DATA={
-        {60,10,0,0,8,0,0},{60,11,1,32,10,0,0},{60,12,1,36,12,2,0},{60,12,1,40,14,0,3},{60,13,1,44,16,3,0},
-        {60,12,2,38,16,0,3},{60,13,2,42,18,2,0},{60,14,2,46,20,3,0},{60,13,2,50,20,0,4},{65,14,2,54,24,3,3},
-        {60,13,2,57,22,0,3},{60,14,2,60,24,3,0},{60,14,2,63,26,0,4},{65,15,3,57,26,3,0},{60,14,3,60,28,0,3},
-        {65,15,3,64,30,3,3},{60,15,3,67,30,4,0},{65,14,3,70,32,0,4},{65,16,3,73,34,4,0},{70,16,3,76,36,4,4},
-        {65,15,3,80,32,3,3},{65,16,3,83,34,4,0},{60,15,3,86,34,0,5},{65,16,4,78,36,3,3},{65,16,4,82,38,4,0},
-        {70,17,4,86,40,0,4},{65,16,4,90,40,4,4},{70,17,4,94,42,5,0},{65,17,4,98,44,0,5},{70,18,4,102,46,5,4},
-        {65,16,4,106,44,4,4},{70,17,4,110,46,5,0},{65,17,5,100,46,0,5},{70,18,5,104,48,4,4},{70,17,5,108,50,5,0},
-        {70,18,5,112,52,0,5},{75,18,5,116,54,5,4},{70,18,5,120,54,6,0},{75,18,5,124,56,0,6},{75,18,5,128,60,5,5},
-        {70,18,5,132,54,5,4},{75,18,5,136,56,6,0},{70,18,6,125,58,0,6},{75,18,6,129,60,5,5},{75,18,6,133,62,6,0},
-        {75,18,6,137,64,0,6},{80,18,6,141,66,6,5},{75,18,6,145,68,5,6},{80,18,6,150,70,6,5},{80,18,6,156,75,6,6}
+        {45,9,2,70,20,3,3},{45,10,2,70,22,3,3},{45,11,2,70,23,3,3},{45,11,2,70,25,3,4},{45,12,2,70,26,4,3},
+        {45,11,3,70,27,3,4},{45,12,3,70,29,3,3},{45,13,3,70,30,4,3},{45,12,3,70,31,3,5},{48,13,3,70,33,4,4},
+        {45,12,3,74,34,4,4},{45,13,3,78,35,4,4},{45,13,3,82,37,4,5},{48,14,4,74,38,4,4},{45,13,4,78,39,4,4},
+        {48,14,4,83,41,4,4},{45,14,4,87,42,5,4},{48,13,4,91,44,4,5},{48,15,4,95,46,5,4},{52,15,4,99,49,5,5},
+        {48,14,4,104,47,4,4},{48,15,4,108,49,5,5},{45,14,4,112,50,5,6},{48,15,5,101,52,4,4},{48,15,5,107,53,5,5},
+        {52,16,5,112,54,5,5},{48,15,5,117,56,5,5},{52,16,5,122,57,6,5},{48,16,5,127,60,5,6},{52,17,5,133,63,6,5},
+        {48,15,5,138,61,5,5},{52,16,5,143,63,6,6},{48,16,6,130,64,6,6},{52,17,6,135,65,5,5},{52,16,6,140,68,6,6},
+        {52,17,6,146,71,6,6},{56,17,6,151,73,6,5},{52,17,6,156,73,7,6},{56,17,6,161,76,6,7},{56,17,6,166,81,6,6},
+        {52,17,6,172,74,6,5},{56,17,6,177,76,7,7},{52,17,7,163,79,6,7},{56,17,7,168,81,6,6},{56,17,7,173,84,7,7},
+        {56,17,7,178,87,6,7},{60,17,7,183,90,7,6},{56,17,7,189,92,6,7},{60,17,7,195,95,7,6},{60,17,7,203,102,7,7}
     };
     private static final String[] NAMES={
-        "Le premier tour","Petite récolte","Deux d’un geste","Trouver le rythme","Un joli trio","Premiers éclats","La bonne ouverture","Prendre large","Sans hésiter","La première couronne",
-        "L’élan","Une poignée de lumière","La cadence","Le troisième éclat","Au bon moment","Le fil se tend","Quatre à la fois","Garder le cap","Une grande brassée","La deuxième couronne",
-        "Le pas de côté","Le grand geste","Cinq sans fausse note","La danse des éclats","Une fenêtre s’ouvre","Le tempo","Le geste précis","Cinq d’un seul tour","Un fil régulier","La troisième couronne",
-        "L’assurance","Le bon détour","Le cinquième éclat","Le passage étroit","Cueillir au vol","Le souffle long","La boucle juste","Six lumières","Une série parfaite","La quatrième couronne",
+        "Le premier tour","Petite récolte","Un geste assuré","Trouver le rythme","Une belle brassée","Premiers éclats","La bonne ouverture","Prendre large","Sans hésiter","La première couronne",
+        "L’élan","Une poignée de lumière","La cadence","Le troisième éclat","Au bon moment","Le fil se tend","La bonne poignée","Garder le cap","Une grande brassée","La deuxième couronne",
+        "Le pas de côté","Le grand geste","Sans fausse note","La danse des éclats","Une fenêtre s’ouvre","Le tempo","Le geste précis","La grande boucle","Un fil régulier","La troisième couronne",
+        "L’assurance","Le bon détour","Le cinquième éclat","Le passage étroit","Cueillir au vol","Le souffle long","La boucle juste","Sept lumières","Une série parfaite","La quatrième couronne",
         "Le dernier chapitre","La grande récolte","La ronde des six","Au cœur du mouvement","L’instant à saisir","Tenir le fil","La main sûre","Le dernier détour","Tout près du sommet","Le grand cercle"
     };
     public static LevelSpec get(int number){

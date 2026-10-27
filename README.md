@@ -1,6 +1,6 @@
 # Boucle
 
-[Télécharger Boucle.apk](https://github.com/Zachiran42/boucle/releases/latest/download/Boucle-1.1.0.apk) · [Versions](https://github.com/Zachiran42/boucle/releases) · [Les 50 niveaux](NIVEAUX.md)
+[Télécharger Boucle.apk](https://github.com/Zachiran42/boucle/releases/latest/download/Boucle-1.1.1.apk) · [Versions](https://github.com/Zachiran42/boucle/releases) · [Les 50 niveaux](NIVEAUX.md)
 
 Jeu Android de dessin et de réflexes créé pour Cercle. Trace une boucle autour des points lumineux et garde les éclats corail à l’extérieur.
 
@@ -20,6 +20,12 @@ Une victoire donne une étoile. Conserver au moins deux vies donne une étoile s
 
 Le **mode libre** reste disponible : parties de60 secondes, trois vies, combos et record local. Son record est conservé lors de la mise à jour depuis 1.0.0.
 
+## Difficulté renforcée en 1.1.1
+
+Les 50 niveaux sont plus exigeants : objectifs de capture augmentés, temps réduit, davantage d’éclats et vitesse relevée. Les objectifs de groupe et de série sont présents dès le début. Le niveau 1 demande 20 captures en 45 secondes, avec deux éclats mobiles, un groupe de 3 et une série de 3. Le dernier niveau demande 102 captures en 60 secondes.
+
+La progression, les étoiles et le record existants sont conservés.
+
 ## Jouer
 
 Pose un doigt dans le terrain, entoure des points clairs, puis reviens au départ pour fermer la boucle. Un éclat corail touché par le trait ou enfermé coûte une vie. Une boucle vide ou un éclat remet la série courante à zéro. Une fois un objectif de série atteint, il reste validé pour ce niveau.
@@ -34,7 +40,7 @@ Télécharger l’APK signé depuis les Releases, puis suivre la confirmation An
 
 Dans [Cercle](https://github.com/Zachiran42/cercle-store), actualiser le catalogue pour retrouver Boucle. L’application peut aussi être ajoutée avec «Ajouter depuis GitHub» et le lien de ce dépôt. Un ajout personnel reste sur ce téléphone ; le catalogue partagé est géré par le propriétaire du store.
 
-Identité : fr.cercle.boucle. Version1.1.0, versionCode 2. Les mises à jour conservent le même identifiant et certificat, avec un versionCode supérieur. Effacer les données ou désinstaller supprime la progression locale et le record.
+Identité : fr.cercle.boucle. Version 1.1.1, versionCode 3. Les mises à jour conservent le même identifiant et certificat, avec un versionCode supérieur. Effacer les données ou désinstaller supprime la progression locale et le record.
 
 ## Compiler sous Windows
 
@@ -47,7 +53,7 @@ Copier .toolchain.example.json en .toolchain.json et renseigner javaHome, androi
 .\scripts\build.ps1 -KeyStore 'C:\cles-privees\boucle.p12' -KeyAlias boucle
 ```
 
-Options : -ToolchainFile, -BuildDir et -OutputFile. L’APK produit par défaut est build/Boucle-1.1.0.apk. Le script compile, aligne, signe et vérifie la signature et le SHA-256.
+Options : -ToolchainFile, -BuildDir et -OutputFile. L’APK produit par défaut est build/Boucle-1.1.1.apk. Le script compile, aligne, signe et vérifie la signature et le SHA-256.
 
 ## Sources et vérification
 

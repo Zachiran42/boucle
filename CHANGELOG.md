@@ -1,5 +1,13 @@
 # Versions
 
+## 1.1.1 — 27 octobre 2026
+
+- Difficulté augmentée sur les 50 niveaux : plus de captures, moins de temps, plus d’éclats et davantage de vitesse.
+- Niveau 1 : 20 captures en 45 secondes, deux obstacles, groupe minimum 3 et série de 3.
+- Objectifs de groupe et de série obligatoires sur toute la campagne.
+- Noms de quelques niveaux adaptés aux nouveaux objectifs.
+- Progression, étoiles et record conservés. Même certificat, versionCode 3.
+
 ## 1.1.0 — 27 octobre 2026
 
 - Campagne de50 niveaux répartis en5 chapitres.
